@@ -1,36 +1,50 @@
 #!/usr/bin/env python3
 import curses
+import json
 from curses import wrapper
+
+class Menu:
+    def __init__(self):
+        self.name = "Cli Menu 0.1beta"
+        self.items = []
+        self.items.append(MenuHeader())
+        self.items.append(MenuItem())
+
+class MenuItem:
+    def __init__(self):
+        self.name = "color test"
+        self.action = "echo test"
+
+class MenuHeader(MenuItem):
+    def __init__(self):
+        self.name = "Cli Menu"
 
 def main(stdscr):
     # Clear screen
     stdscr.clear()
+    curses.curs_set(0)
     curses.start_color()
     curses.use_default_colors()
 
-    menu =  stdscr.subwin(20, 30, 20, 70)
-    menu.border()
-    menu.addstr(0, 0, "Cli Menu 0.1beta")
-    menu.addstr(1, 2, "color test")
-    menu.addstr(3, 2, "color test          <<---")
-    menu.addstr(5, 2, "color test")
-    
-    curses.curs_set(0)
-    menu.hline(2, 1, 0, 28);
-    menu.hline(4, 1, 0, 28);
-    menu.hline(6, 1, 0, 28);
+    window =  stdscr.subwin(20, 30, 20, 70)
+    window.border()
 
-    stdscr.refresh()
-    stdscr.getkey()
-    menu.erase()
-    menu.addstr(3, 2, "color test")
-    menu.addstr(5, 2, "color test          <<---")
-    menu.refresh()
-    stdscr.refresh()
-    stdscr.getkey()
-    menu.refresh()
-    stdscr.refresh()
-    menu.refresh()
-    stdscr.getkey()
+    fileConfig = open("m1.json")
+    fileStr = fileConfig.read()
+
+    # menu = Menu()
+    # row = 0
+    # activeRow = 2;
+    #for menuItem in menu.items:
+    #    if (activeRow == row):
+    #        window.addstr(row, 2, "--->>   " + menuItem.name + "   <<---")
+    #    else:
+    #        window.addstr(row, 2, "        " + menuItem.name + "        ")
+    #    row = row + 1 
+    #    window.hline(row, 1, 0, 28)
+    #    row = row + 1
+
+    #stdscr.refresh()
+    #key = stdscr.getkey()
 
 wrapper(main)
