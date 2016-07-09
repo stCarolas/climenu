@@ -1,0 +1,10 @@
+{
+    "header":"echo test1",
+    "open vim":"vim .",
+    "mc":"echo test2",
+    "complex item":{
+        "action":"vim .",
+        "hotkey":"v",
+        "dynamic":false
+    }
+}
