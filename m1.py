@@ -34,8 +34,8 @@ class Menu:
         self.items = []
         self.active_row = 2
 
-        curses.init_pair(1, curses.COLOR_WHITE, -1)
         if screen != None:
+            curses.init_pair(1, curses.COLOR_WHITE, -1)
             self.window =  screen.subwin(20, 40, 15, 70)
 
     def add_item(self, json):
@@ -53,12 +53,15 @@ class Menu:
         self.items.append(item)
 
     def draw(self):
+        if self.screen == None:
+            return self
+
         self.window.border()
-        self.window.addstr(0, 2,  "Cli Menu 0.1beta")
+        self.window.addstr(0, 2,  "  M1 Cli Menu  ")
         row = 2
         for menuItem in self.items:
             title = menuItem.name
-            if menuItem.menu != None:
+            if menuItem.menu != None or menuItem.generator != None:
                 title ="[ "  + title + " ]"
             else:
                 title = "  " + title
@@ -106,7 +109,12 @@ class Menu:
 
         generator = selected_item.generator
         if generator != None:
-            pass
+            process = subprocess.run(generator.split(" "), stdout=subprocess.PIPE)
+            config = json.loads(process.stdout.decode("UTF-8"))
+            menu = Menu(parent = self, screen = self.screen)
+            for item in config['menu']:
+                menu.add_item(item)
+            return menu
         return self
 
 
@@ -121,7 +129,7 @@ def load(menu, filepath):
 
 def create_menu(stdscr):
     menu = Menu(screen = stdscr)
-    load(menu, "~/.config/m1/menu")
+    load(menu, "/Users/stCarolas/.config/m1/menu")
     load(menu, "./.menu")
     return menu
 
