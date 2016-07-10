@@ -1,51 +1,128 @@
 #!/usr/bin/env python3
 import curses
 import json
+import sys
 import subprocess
 from curses import wrapper
+
+def formalize_menu_item_name(name):
+    if (len(name) < 24):
+        spaces_to_add = 24 - len(name)
+        for i in range (0, spaces_to_add):
+            name = name + " "
+    return name
+
+def cut_menu_item_name(name):
+    if (len(name) > 20):
+        return name[:18] + ".."
+    return name
 
 class MenuItem:
     def __init__(self):
         self.name = ""
+        self.action = None
+        self.menu = None
+        self.generator = None
+
+class Menu:
+    def __init__(self, parent = None, screen = None):
+        self.parent = parent
+        self.screen = screen
+
+        self.name = ""
         self.action = ""
         self.items = []
+        self.active_row = 2
 
-class Menu(MenuItem):
+        curses.init_pair(1, curses.COLOR_WHITE, -1)
+        if screen != None:
+            self.window =  screen.subwin(20, 40, 15, 70)
 
-    def add_menu(self, name, action):
+    def add_item(self, json):
         item = MenuItem()
-        item.name = name
-        if type(action) == str:
-            item.action = action
-        else:
-            if 'action' in action:
-                item.action = action['action']
+        if 'name' in json:
+            item.name = cut_menu_item_name(json['name'])
+        if 'action' in json:
+            item.action = json['action']
+        if 'generator' in json:
+            item.generator = json['generator']
+        if 'menu' in json:
+            item.menu = Menu(parent = self, screen = self.screen)
+            for sub_item in json['menu']:
+                item.menu.add_item(sub_item)
         self.items.append(item)
 
-    def formalize_menu_item_name(self, name):
-        if (len(name) < 15):
-            spaces_to_add = 15 - len(name)
-            for i in range (0, spaces_to_add):
-                name = name + " "
-        return name
-
-    def draw(self, window, active_row):
+    def draw(self):
+        self.window.border()
+        self.window.addstr(0, 2,  "Cli Menu 0.1beta")
         row = 2
         for menuItem in self.items:
-            if (active_row == row):
-                window.addstr(row, 2, "--->> " + self.formalize_menu_item_name(menuItem.name) + " <<---")
+            title = menuItem.name
+            if menuItem.menu != None:
+                title ="[ "  + title + " ]"
             else:
-                window.addstr(row, 2, "      " + self.formalize_menu_item_name(menuItem.name) + "      ")
+                title = "  " + title
+            title = formalize_menu_item_name(title)
+            if (self.active_row == row):
+                # todo separate making title
+                self.window.addstr(row, 2, "--->> " + title + " <<---", curses.color_pair(1))
+            else:
+                self.window.addstr(row, 2, "      " + title + "      ")
             row = row + 1 
-            window.hline(row, 1, 0, 28)
-            row = row + 1
+        return self
+    
+    def next(self):
+        self.active_row = self.active_row + 1
+        return self
+
+    def prev(self):
+        self.active_row = self.active_row - 1
+        return self
+
+    def back(self):
+        if self.parent != None:
+            return self.parent
+        return self
+
+    def go_in(self):
+        selected_item = self.items[self.active_row - 2]
+        submenu = selected_item.menu
+        if submenu != None:
+            return submenu
+        return self
+
+    def execute(self):
+        selected_item = self.items[self.active_row - 2]
+
+        action = selected_item.action
+        if action != None:
+            args = action.split(" ")
+            subprocess.call(args)
+            sys.exit()
+
+        submenu = selected_item.menu
+        if submenu != None:
+            return submenu
+
+        generator = selected_item.generator
+        if generator != None:
+            pass
+        return self
 
 
-def get_local_menu():
-    config = json.load(open(".m1"))
-    menu = Menu()
-    for key in config:
-            menu.add_menu(key, config[key])
+def load(menu, filepath):
+    try:
+        config = json.load(open(filepath))
+        for item in config['menu']:
+            menu.add_item(item)
+    except:
+        pass
+
+
+def create_menu(stdscr):
+    menu = Menu(screen = stdscr)
+    load(menu, "~/.config/m1/menu")
+    load(menu, "./.menu")
     return menu
 
 def main(stdscr):
@@ -54,26 +131,24 @@ def main(stdscr):
     curses.start_color()
     curses.use_default_colors()
 
-    window =  stdscr.subwin(20, 30, 20, 70)
-    menu = get_local_menu()
+    menu = create_menu(stdscr)
 
     key = ''
-    active_row = 2
-    while key != '\n' and key != 'q':
-        if (key == 'KEY_DOWN'):
-            active_row =  active_row + 2
-        if (key == 'KEY_UP'):
-            active_row = active_row - 2
+    while key != 'q':
         stdscr.clear()
-        window.border()
-        window.addstr(0, 2,  "Cli Menu 0.1beta")
-        menu.draw(window, active_row) 
+        menu.draw()
         stdscr.refresh()
         key = stdscr.getkey()
-    if (key == '\n'):
-        action = menu.items[int((active_row -2)/2)].action
-        args = action.split(" ")
-        subprocess.call(args)
+        if (key == 'KEY_DOWN'):
+            menu = menu.next()
+        if (key == 'KEY_UP'):
+            menu = menu.prev()
+        if (key == 'KEY_LEFT'):
+            menu = menu.back()
+        if (key == 'KEY_RIGHT'):
+            menu = menu.go_in()
+        if (key == '\n'):
+            menu = menu.execute()
 
 if __name__ == '__main__':
     wrapper(main)
