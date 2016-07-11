@@ -27,7 +27,7 @@
         },
         {
             "name": "dynamic menu",
-            "generator": "./tmux_menu.py"
+            "generator": "~/.config/m1/tmux_menu.py"
         }
     ]
 }
