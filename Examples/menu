@@ -27,7 +27,7 @@
         },
         {
             "name": "dynamic menu",
-            "generator": "~/.config/m1/generators/tmux_menu.py"
+            "generator": "/home/stcarolas/.config/m1/generators/tmux_menu.py"
         }
     ]
 }

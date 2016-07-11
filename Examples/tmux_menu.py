@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import subprocess
-if __name__ == '__main__':
+import json
+
+def get_menu():
     processResult = subprocess.run(["tmux", "list-session"], stdout = subprocess.PIPE)
     stdout = processResult.stdout.decode("utf-8")
     sessions = stdout.split("\n")
@@ -11,10 +13,15 @@ if __name__ == '__main__':
         if (name != None and len(name) >0):
             names.append(name)
 
-    menu = []
+    menuItems = []
+
     for name in names:
         menuItem = dict()
         menuItem['name'] = name
-        menuItem['action'] = "vim ."
-        menu.append(menuItem)
-    print(menu)
+        menuItem['action'] = 'urxvt -hold -e sh -c " tmux attach -dt local"'
+        menuItems.append(menuItem)
+    menu = {"menu": menuItems}
+    return menu
+
+if __name__ == '__main__':
+    print(json.dumps(get_menu()))

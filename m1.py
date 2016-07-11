@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import curses
+import time
 import json
 import sys
 import subprocess
@@ -33,10 +34,11 @@ class Menu:
         self.action = ""
         self.items = []
         self.active_row = 2
+        self.window = None
 
         if screen != None:
             curses.init_pair(1, curses.COLOR_WHITE, -1)
-            self.window =  screen.subwin(20, 40, 15, 70)
+            curses.init_pair(2, curses.COLOR_GREEN, -1)
 
     def add_item(self, json):
         item = MenuItem()
@@ -53,11 +55,9 @@ class Menu:
         self.items.append(item)
 
     def draw(self):
-        if self.screen == None:
-            return self
-
-        self.window.border()
-        self.window.addstr(0, 2,  "  M1 Cli Menu  ")
+        if self.screen != None:
+            self.screen.border()
+            self.screen.addstr(0, 2,  "  M1 Cli Menu  ")
         row = 2
         for menuItem in self.items:
             title = menuItem.name
@@ -68,9 +68,11 @@ class Menu:
             title = formalize_menu_item_name(title)
             if (self.active_row == row):
                 # todo separate making title
-                self.window.addstr(row, 2, "--->> " + title + " <<---", curses.color_pair(1))
+                if self.screen != None:
+                    self.screen.addstr(row, 2, "--->> " + title + " <<---", curses.color_pair(1))
             else:
-                self.window.addstr(row, 2, "      " + title + "      ")
+                if self.screen != None:
+                    self.screen.addstr(row, 2, "      " + title + "      ")
             row = row + 1 
         return self
     
@@ -84,6 +86,7 @@ class Menu:
 
     def back(self):
         if self.parent != None:
+            self.screen.clear()
             return self.parent
         return self
 
@@ -91,6 +94,7 @@ class Menu:
         selected_item = self.items[self.active_row - 2]
         submenu = selected_item.menu
         if submenu != None:
+            self.screen.clear()
             return submenu
         return self
 
@@ -109,7 +113,11 @@ class Menu:
 
         generator = selected_item.generator
         if generator != None:
-            process = subprocess.run(generator.split(" "), stdout=subprocess.PIPE)
+            args = generator.split(" ")
+            parsed_args = []
+            for arg in args:
+                if arg
+            process = subprocess.run(, stdout=subprocess.PIPE)
             config = json.loads(process.stdout.decode("UTF-8"))
             menu = Menu(parent = self, screen = self.screen)
             for item in config['menu']:
@@ -119,18 +127,15 @@ class Menu:
 
 
 def load(menu, filepath):
-    try:
         config = json.load(open(filepath))
         for item in config['menu']:
             menu.add_item(item)
-    except:
-        pass
 
 
 def create_menu(stdscr):
     menu = Menu(screen = stdscr)
-    load(menu, "/Users/stCarolas/.config/m1/menu")
-    load(menu, "./.menu")
+    load(menu, "/home/stcarolas/.config/m1/menu")
+    #load(menu, "./.menu")
     return menu
 
 def main(stdscr):
@@ -143,7 +148,6 @@ def main(stdscr):
 
     key = ''
     while key != 'q':
-        stdscr.clear()
         menu.draw()
         stdscr.refresh()
         key = stdscr.getkey()
