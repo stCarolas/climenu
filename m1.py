@@ -3,6 +3,8 @@ import curses
 import time
 import json
 import sys
+import re
+import os
 import subprocess
 from curses import wrapper
 
@@ -105,7 +107,6 @@ class Menu:
         if action != None:
             args = action.split(" ")
             subprocess.call(args)
-            sys.exit()
 
         submenu = selected_item.menu
         if submenu != None:
@@ -113,11 +114,16 @@ class Menu:
 
         generator = selected_item.generator
         if generator != None:
-            args = generator.split(" ")
-            parsed_args = []
-            for arg in args:
-                if arg
-            process = subprocess.run(, stdout=subprocess.PIPE)
+            args = []
+            argRegexp = '(-?\S+)|(".+")'
+            m = re.findall(argRegexp, generator)
+            for match in m:
+                match1 = match[0]
+                if match1 != None and match1 != '':
+                    args.append(match1)
+                else:
+                    args.append(match[1])
+            process = subprocess.run(args, stdout=subprocess.PIPE)
             config = json.loads(process.stdout.decode("UTF-8"))
             menu = Menu(parent = self, screen = self.screen)
             for item in config['menu']:
