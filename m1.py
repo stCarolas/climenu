@@ -6,7 +6,11 @@ import sys
 import re
 import os
 import subprocess
+from multiprocessing import Process, Pipe
 from curses import wrapper
+from sender import Sender
+
+menu_listen_conn, menu_send_conn = Pipe()
 
 def formalize_menu_item_name(name):
     if (len(name) < 24):
@@ -76,6 +80,7 @@ class Menu:
                 if self.screen != None:
                     self.screen.addstr(row, 2, "      " + title + "      ")
             row = row + 1 
+        self.screen.refresh()
         return self
     
     def next(self):
@@ -105,12 +110,13 @@ class Menu:
 
         action = selected_item.action
         if action != None:
-            args = action.split(" ")
-            subprocess.call(args)
-
-        submenu = selected_item.menu
-        if submenu != None:
-            return submenu
+            Sender("ws://127.0.0.1:8766").sync_send(
+                channel = "internal",
+                message = action
+            )
+            sys.exit()
+            # args = action.split(" ")
+            # subprocess.call(args)
 
         generator = selected_item.generator
         if generator != None:
@@ -128,6 +134,7 @@ class Menu:
             menu = Menu(parent = self, screen = self.screen)
             for item in config['menu']:
                 menu.add_item(item)
+            self.screen.clear()
             return menu
         return self
 
@@ -155,7 +162,6 @@ def main(stdscr):
     key = ''
     while key != 'q':
         menu.draw()
-        stdscr.refresh()
         key = stdscr.getkey()
         if (key == 'KEY_DOWN'):
             menu = menu.next()
@@ -168,5 +174,8 @@ def main(stdscr):
         if (key == '\n'):
             menu = menu.execute()
 
-if __name__ == '__main__':
+def show_menu():
     wrapper(main)
+
+if __name__ == '__main__':
+    show_menu()
