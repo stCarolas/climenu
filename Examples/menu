@@ -1,32 +1,7 @@
 {
     "menu":[
-        {   
-            "name": "test1",
-            "action": "echo test1"
-        },
         {
-            "name": "open vim",
-            "action": "vim ."
-        },
-        {   
-            "name": "static submenu",
-            "menu": [
-                {
-                    "name": "open vim",
-                    "action": "vim ."
-                },
-                {
-                    "name": "test2",
-                    "action": "vim ."
-                },
-                {
-                    "name": "test3",
-                    "action": "vim ."
-                }
-            ]
-        },
-        {
-            "name": "dynamic menu",
+            "name": "tmux",
             "generator": "/home/stcarolas/.config/m1/generators/tmux_menu.py"
         }
     ]

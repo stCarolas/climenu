@@ -18,7 +18,7 @@ def get_menu():
     for name in names:
         menuItem = dict()
         menuItem['name'] = name
-        menuItem['action'] = 'urxvt -hold -e tmux attach -dt' + name
+        menuItem['action'] = 'urxvt -hold -e tmux attach -dt ' + name
         menuItems.append(menuItem)
     menu = {"menu": menuItems}
     return menu
