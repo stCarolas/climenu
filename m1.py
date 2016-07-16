@@ -6,11 +6,7 @@ import sys
 import re
 import os
 import subprocess
-from multiprocessing import Process, Pipe
 from curses import wrapper
-from sender import Sender
-
-menu_listen_conn, menu_send_conn = Pipe()
 
 def formalize_menu_item_name(name):
     if (len(name) < 24):
@@ -40,7 +36,6 @@ class Menu:
         self.action = ""
         self.items = []
         self.active_row = 2
-        self.window = None
 
         if screen != None:
             curses.init_pair(1, curses.COLOR_WHITE, -1)
@@ -54,7 +49,7 @@ class Menu:
             item.action = json['action']
         if 'generator' in json:
             item.generator = json['generator']
-        if 'menu' in json:
+        if 'menu' in json: 
             item.menu = Menu(parent = self, screen = self.screen)
             for sub_item in json['menu']:
                 item.menu.add_item(sub_item)
@@ -85,10 +80,14 @@ class Menu:
     
     def next(self):
         self.active_row = self.active_row + 1
+        if len(self.items) == self.active_row - 2:
+            self.active_row = 2;
         return self
 
     def prev(self):
         self.active_row = self.active_row - 1
+        if self.active_row < 2:
+            self.active_row = len(self.items) + 2 - 1
         return self
 
     def back(self):
@@ -110,13 +109,9 @@ class Menu:
 
         action = selected_item.action
         if action != None:
-            Sender("ws://127.0.0.1:8766").sync_send(
-                channel = "internal",
-                message = action
-            )
+            args = action.split(" ")
+            subprocess.call(args)
             sys.exit()
-            # args = action.split(" ")
-            # subprocess.call(args)
 
         generator = selected_item.generator
         if generator != None:
@@ -139,7 +134,7 @@ class Menu:
         return self
 
 
-def load(menu, filepath):
+def load_menu(menu, filepath):
         config = json.load(open(filepath))
         for item in config['menu']:
             menu.add_item(item)
@@ -147,8 +142,8 @@ def load(menu, filepath):
 
 def create_menu(stdscr):
     menu = Menu(screen = stdscr)
-    load(menu, "/home/stcarolas/.config/m1/menu")
-    #load(menu, "./.menu")
+    load_menu(menu, "/home/stcarolas/.config/m1/menu")
+    # load(menu, "./.menu")
     return menu
 
 def main(stdscr):
@@ -174,8 +169,5 @@ def main(stdscr):
         if (key == '\n'):
             menu = menu.execute()
 
-def show_menu():
-    wrapper(main)
-
 if __name__ == '__main__':
-    show_menu()
+    wrapper(main)

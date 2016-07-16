@@ -3,6 +3,10 @@
         {
             "name": "tmux",
             "generator": "/home/stcarolas/.config/m1/generators/tmux_menu.py"
+        },
+        {
+            "name": "vim",
+            "action": "vim ."
         }
     ]
 }
