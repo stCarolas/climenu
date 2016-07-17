@@ -7,6 +7,10 @@
         {
             "name": "vim",
             "action": "vim ."
+        },
+        {
+            "name": "projects",
+            "generator": "/Users/stCarolas/.config/m1/generators/vim_projects.py"
         }
     ]
 }
