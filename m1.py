@@ -6,6 +6,7 @@ import sys
 import re
 import os
 import subprocess
+from os.path import expanduser
 from curses import wrapper
 
 def formalize_menu_item_name(name):
@@ -142,7 +143,8 @@ def load_menu(menu, filepath):
 
 def create_menu(stdscr):
     menu = Menu(screen = stdscr)
-    load_menu(menu, "/home/stcarolas/.config/m1/menu")
+    load_menu(menu, expanduser("~/.config/m1/menu"))
+   
     # load(menu, "./.menu")
     return menu
 
