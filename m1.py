@@ -55,6 +55,7 @@ class Menu:
         if 'action' in jsonConfig:
             item.action = jsonConfig['action']
             logging.debug("set action:" + item.action)
+            self.items.append(item)
         if 'generator' in jsonConfig:
             item.generator = jsonConfig['generator']
             logging.debug("using generator:" + item.generator)
@@ -79,7 +80,7 @@ class Menu:
             logging.debug("start filling menu")
             for sub_item in jsonConfig['menu']:
                 item.menu.add_item(sub_item)
-        self.items.append(item)
+            self.items.append(item)
         if item.name != None:
             logging.debug("end with" + item.name)
 
@@ -201,7 +202,4 @@ def main(stdscr):
             menu = menu.execute()
 
 if __name__ == '__main__':
-    #menu = create_menu(None)
-    #for item in menu.items:
-    #    print(item)
     wrapper(main)
