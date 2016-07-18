@@ -1,16 +1,16 @@
 {
     "menu":[
         {
-            "name": "tmux",
-            "generator": "/home/stcarolas/.config/m1/generators/tmux_menu.py"
-        },
-        {
             "name": "vim",
             "action": "vim ."
         },
         {
             "name": "projects",
-            "generator": "/Users/stCarolas/.config/m1/generators/vim_projects.py"
+            "menu": [
+                {
+                    "generator": "~/.config/m1/generators/vim_projects.py"
+                }
+            ]
         }
     ]
 }

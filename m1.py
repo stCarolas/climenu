@@ -5,9 +5,13 @@ import json
 import sys
 import re
 import os
+import logging
+from pathlib import Path
 import subprocess
 from os.path import expanduser
 from curses import wrapper
+
+logging.basicConfig(filename='debug.log',level=logging.DEBUG)
 
 def formalize_menu_item_name(name):
     if (len(name) < 24):
@@ -42,19 +46,42 @@ class Menu:
             curses.init_pair(1, curses.COLOR_WHITE, -1)
             curses.init_pair(2, curses.COLOR_GREEN, -1)
 
-    def add_item(self, json):
+    def add_item(self, jsonConfig):
+        logging.debug("adding item:" + str(jsonConfig))
         item = MenuItem()
-        if 'name' in json:
-            item.name = cut_menu_item_name(json['name'])
-        if 'action' in json:
-            item.action = json['action']
-        if 'generator' in json:
-            item.generator = json['generator']
-        if 'menu' in json: 
+        if 'name' in jsonConfig:
+            item.name = cut_menu_item_name(jsonConfig['name'])
+            logging.debug("set name:" + item.name)
+        if 'action' in jsonConfig:
+            item.action = jsonConfig['action']
+            logging.debug("set action:" + item.action)
+        if 'generator' in jsonConfig:
+            item.generator = jsonConfig['generator']
+            logging.debug("using generator:" + item.generator)
+            args = []
+            argRegexp = '(-?\S+)|(".+")'
+            m = re.findall(argRegexp, item.generator)
+            for match in m:
+                match0 = match[0]
+                if match0 != None and match0 != '':
+                    command =  match0.replace('~', str(Path.home()))
+                    print(command)
+                    args.append(match0.replace('~', str(Path.home())))
+                else:
+                    args.append(match[1])
+            process = subprocess.run(args, stdout=subprocess.PIPE)
+            config = json.loads(process.stdout.decode("UTF-8"))
+            logging.debug("generated:" + str(config))
+            for generated_item in config['menu']:
+                self.add_item(generated_item)
+        if 'menu' in jsonConfig: 
             item.menu = Menu(parent = self, screen = self.screen)
-            for sub_item in json['menu']:
+            logging.debug("start filling menu")
+            for sub_item in jsonConfig['menu']:
                 item.menu.add_item(sub_item)
         self.items.append(item)
+        if item.name != None:
+            logging.debug("end with" + item.name)
 
     def draw(self):
         if self.screen != None:
@@ -114,26 +141,7 @@ class Menu:
             subprocess.call(args)
             sys.exit()
 
-        generator = selected_item.generator
-        if generator != None:
-            args = []
-            argRegexp = '(-?\S+)|(".+")'
-            m = re.findall(argRegexp, generator)
-            for match in m:
-                match1 = match[0]
-                if match1 != None and match1 != '':
-                    args.append(match1)
-                else:
-                    args.append(match[1])
-            process = subprocess.run(args, stdout=subprocess.PIPE)
-            config = json.loads(process.stdout.decode("UTF-8"))
-            menu = Menu(parent = self, screen = self.screen)
-            for item in config['menu']:
-                menu.add_item(item)
-            self.screen.clear()
-            return menu
-        return self
-
+        return self.go_in()
 
 def load_menu(menu, filepath):
         config = json.load(open(filepath))
@@ -144,9 +152,30 @@ def load_menu(menu, filepath):
 def create_menu(stdscr):
     menu = Menu(screen = stdscr)
     load_menu(menu, expanduser("~/.config/m1/menu"))
+    logging.debug(print_menu(menu))
    
     # load(menu, "./.menu")
     return menu
+
+def print_menu(menu):
+    printed_menu =  ""
+    if type(menu) == Menu:
+        if menu.name != None:
+            printed_menu = printed_menu + "###" + menu.name
+        for item in menu.items:
+            printed_menu = printed_menu + "\n" + print_menu(item)
+        return printed_menu
+    if menu.menu != None:
+        if menu.name != None:
+            printed_menu = printed_menu + "###" + menu.name
+        for item in menu.menu.items:
+            printed_menu = printed_menu + "\n" + print_menu(item)
+    if type(menu) == MenuItem:
+        if menu.name != None:
+            printed_menu = printed_menu + menu.name
+        if menu.action != None:
+            printed_menu = printed_menu + " !" + menu.action
+    return printed_menu
 
 def main(stdscr):
     # Clear screen
@@ -172,4 +201,7 @@ def main(stdscr):
             menu = menu.execute()
 
 if __name__ == '__main__':
+    #menu = create_menu(None)
+    #for item in menu.items:
+    #    print(item)
     wrapper(main)
