@@ -47,14 +47,13 @@ class Menu:
             curses.init_pair(2, curses.COLOR_GREEN, -1)
 
     def add_item(self, jsonConfig):
-        logging.debug("adding item:" + str(jsonConfig))
         item = MenuItem()
         if 'name' in jsonConfig:
             item.name = cut_menu_item_name(jsonConfig['name'])
-            logging.debug("set name:" + item.name)
+        if 'key' in jsonConfig:
+            item.key = jsonConfig
         if 'action' in jsonConfig:
             item.action = jsonConfig['action']
-            logging.debug("set action:" + item.action)
             self.items.append(item)
         if 'generator' in jsonConfig:
             item.generator = jsonConfig['generator']
@@ -77,12 +76,9 @@ class Menu:
                 self.add_item(generated_item)
         if 'menu' in jsonConfig: 
             item.menu = Menu(parent = self, screen = self.screen)
-            logging.debug("start filling menu")
             for sub_item in jsonConfig['menu']:
                 item.menu.add_item(sub_item)
             self.items.append(item)
-        if item.name != None:
-            logging.debug("end with" + item.name)
 
     def draw(self):
         if self.screen != None:
@@ -145,9 +141,12 @@ class Menu:
         return self.go_in()
 
 def load_menu(menu, filepath):
+    try:
         config = json.load(open(filepath))
         for item in config['menu']:
             menu.add_item(item)
+    except Exception:
+            logging.warn("exception while loading menu")
 
 
 def create_menu(stdscr):

@@ -7,8 +7,11 @@ from pathlib import Path
 
 def check_dir(path):
     rootPath = str(path)
-    gradleFilePath = Path(rootPath).joinpath("build.gradle")
-    if gradleFilePath.exists():
+    if Path(rootPath).joinpath("build.gradle").exists():
+        return True
+    if Path(rootPath).joinpath("pom.xml").exists():
+        return True
+    if Path(rootPath).joinpath("Makefile").exists():
         return True
 
 def get_menu():
@@ -24,7 +27,7 @@ def get_menu():
     for subdir in subdirs:
         menuItem = dict()
         menuItem['name'] = subdir.name
-        menuItem['action'] = "vim " + str(subdir.resolve())
+        menuItem['action'] =  "vim " + str(subdir.resolve())
         menuItems.append(menuItem)
     menu = {"menu":menuItems}
     return menu
