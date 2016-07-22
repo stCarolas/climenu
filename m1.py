@@ -30,6 +30,7 @@ class MenuItem:
         self.name = ""
         self.action = None
         self.menu = None
+        self.hotkey = None
         self.generator = None
 
 class Menu:
@@ -77,14 +78,15 @@ class Menu:
             for generated_item in config['menu']:
                 self.add_item(generated_item)
 
+        if 'key' in jsonConfig:
+            item.hotkey = jsonConfig['key']
+
         if 'menu' in jsonConfig: 
             item.menu = Menu(parent = self, screen = self.screen)
             for sub_item in jsonConfig['menu']:
                 item.menu.add_item(sub_item)
             self.items.append(item)
-
-        if 'key' in jsonConfig:
-            self.hotkeys[jsonConfig['key']] = item
+            item.menu.create_hotkeys()
 
     def draw(self):
         if self.screen != None:
@@ -98,6 +100,10 @@ class Menu:
             else:
                 title = "  " + title
             title = formalize_menu_item_name(title)
+            if menuItem.hotkey != None:
+                title = menuItem.hotkey + "   " + title
+            else:
+                title = "    " + title
             if (self.active_row == row):
                 # todo separate making title
                 if self.screen != None:
@@ -162,13 +168,22 @@ class Menu:
 
         return self
 
-
+    def create_hotkeys(self):
+        i = ord('a');
+        for item in self.items:
+            if item.hotkey != None:
+                self.hotkeys[item.hotkey] = item
+            else:
+                if item.name != None:
+                    item.hotkey = item.name[0]
+                    self.hotkeys[item.hotkey] = item
 
 def load_menu(menu, filepath):
     try:
         config = json.load(open(filepath))
         for item in config['menu']:
             menu.add_item(item)
+        menu.create_hotkeys()
     except Exception:
             logging.warn("exception while loading menu")
 

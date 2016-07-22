@@ -15,6 +15,10 @@
             "menu": [
                 {
                     "generator": "~/.config/m1/generators/tmux_menu.py"
+                },
+                {
+                    "name": "create session",
+                    "action": "tmux -2 new-session -AdD"
                 }
             ]
         }
