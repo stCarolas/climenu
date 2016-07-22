@@ -21,7 +21,7 @@ def formalize_menu_item_name(name):
     return name
 
 def cut_menu_item_name(name):
-    if (len(name) > 20):
+    if (len(name) > 50):
         return name[:18] + ".."
     return name
 
@@ -40,6 +40,7 @@ class Menu:
         self.name = ""
         self.action = ""
         self.items = []
+        self.hotkeys = dict()
         self.active_row = 2
 
         if screen != None:
@@ -48,13 +49,14 @@ class Menu:
 
     def add_item(self, jsonConfig):
         item = MenuItem()
+
         if 'name' in jsonConfig:
             item.name = cut_menu_item_name(jsonConfig['name'])
-        if 'key' in jsonConfig:
-            item.key = jsonConfig
+            
         if 'action' in jsonConfig:
             item.action = jsonConfig['action']
             self.items.append(item)
+
         if 'generator' in jsonConfig:
             item.generator = jsonConfig['generator']
             logging.debug("using generator:" + item.generator)
@@ -74,11 +76,15 @@ class Menu:
             logging.debug("generated:" + str(config))
             for generated_item in config['menu']:
                 self.add_item(generated_item)
+
         if 'menu' in jsonConfig: 
             item.menu = Menu(parent = self, screen = self.screen)
             for sub_item in jsonConfig['menu']:
                 item.menu.add_item(sub_item)
             self.items.append(item)
+
+        if 'key' in jsonConfig:
+            self.hotkeys[jsonConfig['key']] = item
 
     def draw(self):
         if self.screen != None:
@@ -135,10 +141,28 @@ class Menu:
         action = selected_item.action
         if action != None:
             args = action.split(" ")
-            subprocess.call(args)
+            subprocess.run(args)
             sys.exit()
 
         return self.go_in()
+
+    def handle_hotkey(self, key):
+        if key in self.hotkeys.keys():
+            selected_item = self.hotkeys[key]
+            action = selected_item.action
+            if action != None:
+                args = action.split(" ")
+                subprocess.run(args)
+                sys.exit()
+
+            submenu = selected_item.menu
+            if submenu != None:
+                self.screen.clear()
+                return submenu
+
+        return self
+
+
 
 def load_menu(menu, filepath):
     try:
@@ -150,12 +174,12 @@ def load_menu(menu, filepath):
 
 
 def create_menu(stdscr):
-    menu = Menu(screen = stdscr)
-    load_menu(menu, expanduser("~/.config/m1/menu"))
-    logging.debug(print_menu(menu))
-   
-    # load(menu, "./.menu")
-    return menu
+        menu = Menu(screen = stdscr)
+        load_menu(menu, expanduser("~/.config/m1/menu"))
+        logging.debug(print_menu(menu))
+
+        # load(menu, "./.menu")
+        return menu
 
 def print_menu(menu):
     printed_menu =  ""
@@ -199,6 +223,8 @@ def main(stdscr):
             menu = menu.go_in()
         if (key == '\n'):
             menu = menu.execute()
+        if key not in ('KEY_DOWN','KEY_UP','KEY_LEFT','KEY_RIGHT', '\n'):
+            menu = menu.handle_hotkey(key)
 
 if __name__ == '__main__':
     wrapper(main)
