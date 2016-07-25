@@ -192,6 +192,7 @@ def load_menu(menu, filepath):
 def create_menu(stdscr):
         menu = Menu(screen = stdscr)
         load_menu(menu, expanduser("~/.config/m1/menu"))
+        # todo add local menu
         logging.debug(print_menu(menu))
 
         # load(menu, "./.menu")
