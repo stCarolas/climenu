@@ -7,6 +7,7 @@ import re
 import os
 import logging
 from pathlib import Path
+from pathlib import PurePath
 import subprocess
 from os.path import expanduser
 from curses import wrapper
@@ -185,17 +186,30 @@ def load_menu(menu, filepath):
         for item in config['menu']:
             menu.add_item(item)
         menu.create_hotkeys()
-    except Exception:
-            logging.warn("exception while loading menu")
+    except Exception as a:
+            logging.warn("exception while loading menu " + str(a))
+
+def get_local_menu():
+    work_dir = Path.cwd();
+    while work_dir != None:
+        if check_menu_exists(work_dir):
+            return str(work_dir.joinpath(".menu")) 
+        else:
+            work_dir = work_dir.parent
+    
+def check_menu_exists(path):
+    return path.joinpath(".menu").exists()
 
 
 def create_menu(stdscr):
+        local_menu_dir  = get_local_menu();
+        logging.debug("local menu = " + local_menu_dir);
+
         menu = Menu(screen = stdscr)
         load_menu(menu, expanduser("~/.config/m1/menu"))
-        # todo add local menu
+        load_menu(menu, expanduser(local_menu_dir))
         logging.debug(print_menu(menu))
 
-        # load(menu, "./.menu")
         return menu
 
 def print_menu(menu):
