@@ -18,7 +18,7 @@ def get_menu():
     for name in names:
         menuItem = dict()
         menuItem['name'] = name
-        menuItem['action'] = 'tmux attach -dt ' + name
+        menuItem['action'] = 'tmux -2 attach -dt ' + name
         menuItems.append(menuItem)
     menu = {"menu": menuItems}
     return menu

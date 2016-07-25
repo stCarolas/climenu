@@ -191,25 +191,27 @@ def load_menu(menu, filepath):
 
 def get_local_menu():
     work_dir = Path.cwd();
-    while work_dir != None:
+    while work_dir != None and work_dir >= Path.home() :
         if check_menu_exists(work_dir):
             return str(work_dir.joinpath(".menu")) 
         else:
             work_dir = work_dir.parent
+    return None
     
 def check_menu_exists(path):
     return path.joinpath(".menu").exists()
 
 
 def create_menu(stdscr):
-        local_menu_dir  = get_local_menu();
-        logging.debug("local menu = " + local_menu_dir);
-
         menu = Menu(screen = stdscr)
         load_menu(menu, expanduser("~/.config/m1/menu"))
-        load_menu(menu, expanduser(local_menu_dir))
-        logging.debug(print_menu(menu))
 
+        local_menu_dir  = get_local_menu();
+        if local_menu_dir != None:
+            logging.debug("local menu = " + local_menu_dir)
+            load_menu(menu, expanduser(local_menu_dir))
+
+        logging.debug(print_menu(menu))
         return menu
 
 def print_menu(menu):

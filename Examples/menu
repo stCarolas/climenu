@@ -2,7 +2,6 @@
     "menu":[
         {
             "name": "projects",
-            "key": "p",
             "menu": [
                 {
                     "generator": "~/.config/m1/generators/vim_projects.py"
@@ -11,16 +10,19 @@
         },
         {
             "name": "tmux",
-            "key": "t",
             "menu": [
                 {
                     "generator": "~/.config/m1/generators/tmux_menu.py"
                 },
                 {
-                    "name": "create session",
-                    "action": "tmux -2 new-session -AdD"
+                    "name": "new session",
+                    "action": "tmux -2"
                 }
             ]
+        },
+        {
+            "name": "deploy projects",
+            "action": "~/.config/m1/generators/deploy_projects.py"
         }
     ]
 }
