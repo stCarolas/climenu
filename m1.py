@@ -93,6 +93,7 @@ class Menu:
             self.screen.border()
             self.screen.addstr(0, 2,  "  M1 Cli Menu  ")
         row = 2
+        # todo position instead of string concat
         for menuItem in self.items:
             title = menuItem.name
             if menuItem.menu != None or menuItem.generator != None:
