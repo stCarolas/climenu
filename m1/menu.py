@@ -1,38 +1,16 @@
 #!/usr/bin/env python3
+
 import curses
-import time
 import json
 import sys
 import re
 import os
 import logging
 from pathlib import Path
-from pathlib import PurePath
 import subprocess
 from os.path import expanduser
-from curses import wrapper
-
-logging.basicConfig(filename='debug.log',level=logging.DEBUG)
-
-def formalize_menu_item_name(name):
-    if (len(name) < 24):
-        spaces_to_add = 24 - len(name)
-        for i in range (0, spaces_to_add):
-            name = name + " "
-    return name
-
-def cut_menu_item_name(name):
-    if (len(name) > 50):
-        return name[:18] + ".."
-    return name
-
-class MenuItem:
-    def __init__(self):
-        self.name = ""
-        self.action = None
-        self.menu = None
-        self.hotkey = None
-        self.generator = None
+import menuitem
+from menuitem import MenuItem
 
 class Menu:
     def __init__(self, parent = None, screen = None):
@@ -53,7 +31,7 @@ class Menu:
         item = MenuItem()
 
         if 'name' in jsonConfig:
-            item.name = cut_menu_item_name(jsonConfig['name'])
+            item.name = menuitem.cut_name(jsonConfig['name'])
             
         if 'action' in jsonConfig:
             item.action = jsonConfig['action']
@@ -101,7 +79,7 @@ class Menu:
                 title ="[ "  + title + " ]"
             else:
                 title = "  " + title
-            title = formalize_menu_item_name(title)
+            title = menuitem.formalize_name(title)
             if menuItem.hotkey != None:
                 title = menuItem.hotkey + "   " + title
             else:
@@ -145,7 +123,6 @@ class Menu:
 
     def execute(self):
         selected_item = self.items[self.active_row - 2]
-
         action = selected_item.action
         if action != None:
             args = action.split(" ")
@@ -180,84 +157,3 @@ class Menu:
                     item.hotkey = item.name[0]
                     self.hotkeys[item.hotkey] = item
 
-def load_menu(menu, filepath):
-    try:
-        config = json.load(open(filepath))
-        for item in config['menu']:
-            menu.add_item(item)
-        menu.create_hotkeys()
-    except Exception as a:
-            logging.warn("exception while loading menu " + str(a))
-
-def get_local_menu():
-    work_dir = Path.cwd();
-    while work_dir != None and work_dir >= Path.home() :
-        if check_menu_exists(work_dir):
-            return str(work_dir.joinpath(".menu")) 
-        else:
-            work_dir = work_dir.parent
-    return None
-    
-def check_menu_exists(path):
-    return path.joinpath(".menu").exists()
-
-
-def create_menu(stdscr):
-        menu = Menu(screen = stdscr)
-        load_menu(menu, expanduser("~/.config/m1/menu"))
-
-        local_menu_dir  = get_local_menu();
-        if local_menu_dir != None:
-            logging.debug("local menu = " + local_menu_dir)
-            load_menu(menu, expanduser(local_menu_dir))
-
-        logging.debug(print_menu(menu))
-        return menu
-
-def print_menu(menu):
-    printed_menu =  ""
-    if type(menu) == Menu:
-        if menu.name != None:
-            printed_menu = printed_menu + "###" + menu.name
-        for item in menu.items:
-            printed_menu = printed_menu + "\n" + print_menu(item)
-        return printed_menu
-    if menu.menu != None:
-        if menu.name != None:
-            printed_menu = printed_menu + "###" + menu.name
-        for item in menu.menu.items:
-            printed_menu = printed_menu + "\n" + print_menu(item)
-    if type(menu) == MenuItem:
-        if menu.name != None:
-            printed_menu = printed_menu + menu.name
-        if menu.action != None:
-            printed_menu = printed_menu + " !" + menu.action
-    return printed_menu
-
-def main(stdscr):
-    # Clear screen
-    curses.curs_set(0)
-    curses.start_color()
-    curses.use_default_colors()
-
-    menu = create_menu(stdscr)
-
-    key = ''
-    while key != 'q':
-        menu.draw()
-        key = stdscr.getkey()
-        if (key == 'KEY_DOWN'):
-            menu = menu.next()
-        if (key == 'KEY_UP'):
-            menu = menu.prev()
-        if (key == 'KEY_LEFT'):
-            menu = menu.back()
-        if (key == 'KEY_RIGHT'):
-            menu = menu.go_in()
-        if (key == '\n'):
-            menu = menu.execute()
-        if key not in ('KEY_DOWN','KEY_UP','KEY_LEFT','KEY_RIGHT', '\n'):
-            menu = menu.handle_hotkey(key)
-
-if __name__ == '__main__':
-    wrapper(main)
