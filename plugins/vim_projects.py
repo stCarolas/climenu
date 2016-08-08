@@ -15,7 +15,7 @@ def check_dir(path):
         return True
 
 def get_menu():
-    projects_dir_path = "/home/stcarolas/Coding/NetBeansProjects"
+    projects_dir_path = "/home/stcarolas/Coding/projects"
     p = Path(expanduser(projects_dir_path))
 
     subdirs = []

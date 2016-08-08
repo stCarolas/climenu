@@ -6,8 +6,8 @@ import logging
 from pathlib import Path
 from os.path import expanduser
 from curses import wrapper
-from menu import Menu
-from menuitem import MenuItem
+from m1.menu import Menu
+from m1.menuitem import MenuItem
 
 def load_menu(menu, filepath):
     try:

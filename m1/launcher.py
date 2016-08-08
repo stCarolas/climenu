@@ -6,11 +6,11 @@ import logging
 from pathlib import Path
 from os.path import expanduser
 from curses import wrapper
-from menu import Menu
-from menuitem import MenuItem
-from menufactory import create_menu
+from m1.menu import Menu
+from m1.menuitem import MenuItem
+from m1.menufactory import create_menu
 
-logging.basicConfig(filename='/Users/stCarolas/debug.log',level=logging.DEBUG)
+logging.basicConfig(filename='/home/stcarolas/debug.log',level=logging.DEBUG)
 __version__ = '0.1'
 
 def main(stdscr):

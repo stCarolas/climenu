@@ -7,7 +7,7 @@ install:
 	cp config/menu /home/stcarolas/.config/m1/
 
 install_to_home:
-	pip3 install --upgrade --force-reinstall --user ./m1
+	pip3 install --upgrade --force-reinstall --user .
 	cp plugins/tmux_menu.py ~/.config/m1/generators
 	cp plugins/vim_projects.py ~/.config/m1/generators
 	cp plugins/deploy_projects.py ~/.config/m1/generators
