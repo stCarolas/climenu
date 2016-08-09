@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+__version__ = '0.1'
+__author__ = 'stCarolas'
+
 import curses
 import json
 import logging
@@ -9,9 +12,14 @@ from curses import wrapper
 from menu import Menu
 from menuitem import MenuItem
 from menufactory import create_menu
+import os
 
-logging.basicConfig(filename='/Users/stCarolas/debug.log',level=logging.DEBUG)
-__version__ = '0.1'
+logPath = '/Users/stCarolas/debug.log'
+try:
+    os.remove(logPath)
+except:
+    pass
+logging.basicConfig(filename=logPath,level=logging.DEBUG)
 
 def main(stdscr):
     # Clear screen
