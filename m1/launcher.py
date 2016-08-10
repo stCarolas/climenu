@@ -6,20 +6,19 @@ __author__ = 'stCarolas'
 import curses
 import json
 import logging
+import os
 from pathlib import Path
 from os.path import expanduser
 from curses import wrapper
-from menu import Menu
-from menuitem import MenuItem
-from menufactory import create_menu
-import os
+from m1.menu import Menu
+from m1.menuitem import MenuItem
+from m1.menufactory import create_menu
 
 logPath = '/Users/stCarolas/debug.log'
 try:
     os.remove(logPath)
 except:
     pass
-logging.basicConfig(filename=logPath,level=logging.DEBUG)
 
 def main(stdscr):
     # Clear screen

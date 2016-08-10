@@ -9,8 +9,8 @@ import logging
 from pathlib import Path
 import subprocess
 from os.path import expanduser
-import menuitem
-from menuitem import MenuItem
+import m1
+from m1.menuitem import MenuItem
 
 class Menu:
     def __init__(self, parent = None, screen = None):
@@ -31,31 +31,34 @@ class Menu:
         item = MenuItem()
 
         if 'name' in jsonConfig:
-            item.name = menuitem.cut_name(jsonConfig['name'])
+            item.name = m1.menuitem.cut_name(jsonConfig['name'])
             
         if 'action' in jsonConfig:
             item.action = jsonConfig['action']
             self.items.append(item)
 
         if 'generator' in jsonConfig:
-            item.generator = jsonConfig['generator']
-            logging.debug("using generator:" + item.generator)
-            args = []
-            argRegexp = '(-?\S+)|(".+")'
-            m = re.findall(argRegexp, item.generator)
-            for match in m:
-                match0 = match[0]
-                if match0 != None and match0 != '':
-                    command =  match0.replace('~', str(Path.home()))
-                    print(command)
-                    args.append(match0.replace('~', str(Path.home())))
-                else:
-                    args.append(match[1])
-            process = subprocess.run(args, stdout=subprocess.PIPE)
-            config = json.loads(process.stdout.decode("UTF-8"))
-            logging.debug("generated:" + str(config))
-            for generated_item in config['menu']:
-                self.add_item(generated_item)
+            try:
+                item.generator = jsonConfig['generator']
+                logging.debug("using generator:" + item.generator)
+                args = []
+                argRegexp = '(-?\S+)|(".+")'
+                m = re.findall(argRegexp, item.generator)
+                for match in m:
+                    match0 = match[0]
+                    if match0 != None and match0 != '':
+                        command =  match0.replace('~', str(Path.home()))
+                        print(command)
+                        args.append(match0.replace('~', str(Path.home())))
+                    else:
+                        args.append(match[1])
+                process = subprocess.run(args, stdout=subprocess.PIPE)
+                config = json.loads(process.stdout.decode("UTF-8"))
+                logging.debug("generated:" + str(config))
+                for generated_item in config['menu']:
+                    self.add_item(generated_item)
+            except:
+                pass
 
         if 'key' in jsonConfig:
             item.hotkey = jsonConfig['key']
@@ -79,7 +82,7 @@ class Menu:
                 title ="[ "  + title + " ]"
             else:
                 title = "  " + title
-            title = menuitem.formalize_name(title)
+            title = m1.menuitem.formalize_name(title)
             if menuItem.hotkey != None:
                 title = menuItem.hotkey + "   " + title
             else:
