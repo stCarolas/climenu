@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-__version__ = '0.1'
-__author__ = 'stCarolas'
-
 import curses
 import json
 import logging
@@ -19,6 +16,11 @@ try:
     os.remove(logPath)
 except:
     pass
+
+logging.basicConfig(
+        filename = expanduser(logPath),
+        level = logging.DEBUG
+)
 
 def main(stdscr):
     # Clear screen
