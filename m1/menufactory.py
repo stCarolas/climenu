@@ -20,6 +20,7 @@ def load_menu(menu, filepath):
 
 def get_local_menu():
     work_dir = Path.cwd();
+    logging.debug("work_dir" + str(work_dir));
     while work_dir != None and work_dir >= Path.home() :
         if check_menu_exists(work_dir):
             return str(work_dir.joinpath(".menu")) 
@@ -32,12 +33,13 @@ def check_menu_exists(path):
 
 def create_menu(stdscr):
         menu = Menu(screen = stdscr)
-        load_menu(menu, expanduser("~/.config/m1/menu"))
 
         local_menu_dir  = get_local_menu();
         if local_menu_dir != None:
             logging.debug("local menu = " + local_menu_dir)
             load_menu(menu, expanduser(local_menu_dir))
+
+        load_menu(menu, expanduser("~/.config/m1/menu"))
 
         logging.debug(print_menu(menu))
         return menu

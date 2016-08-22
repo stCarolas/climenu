@@ -19,10 +19,6 @@
                     "action": "tmux -2"
                 }
             ]
-        },
-        {
-            "name": "deploy projects",
-            "action": "~/.config/m1/generators/deploy_projects.py"
         }
     ]
 }

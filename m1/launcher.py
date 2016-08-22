@@ -11,7 +11,7 @@ from m1.menu import Menu
 from m1.menuitem import MenuItem
 from m1.menufactory import create_menu
 
-logPath = '/Users/stCarolas/debug.log'
+logPath = expanduser('~/m1.log')
 try:
     os.remove(logPath)
 except:
