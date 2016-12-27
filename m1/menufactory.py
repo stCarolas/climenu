@@ -31,7 +31,7 @@ def get_local_menu():
 def check_menu_exists(path):
     return path.joinpath(".menu").exists()
 
-def create_menu(stdscr):
+def create_menu(stdscr = None):
         menu = Menu(screen = stdscr)
 
         local_menu_dir  = get_local_menu();
@@ -44,6 +44,24 @@ def create_menu(stdscr):
         logging.debug(print_menu(menu))
         return menu
 
+def print_menu_simple(menu, with_action = False):
+    printed_menu =  ""
+    if type(menu) == Menu:
+        if menu.name != None:
+            printed_menu = printed_menu + "#" + menu.name
+        return printed_menu
+    if menu.menu != None:
+        if menu.name != None:
+            printed_menu = printed_menu + "#" + menu.name
+        for item in menu.menu.items:
+            printed_menu = printed_menu + "\n" + print_menu(item)
+    if type(menu) == MenuItem:
+        if menu.name != None:
+            printed_menu = printed_menu + menu.name
+        if menu.action != None:
+            printed_menu = printed_menu + " !" + menu.action
+    return printed_menu
+    
 def print_menu(menu):
     printed_menu =  ""
     if type(menu) == Menu:

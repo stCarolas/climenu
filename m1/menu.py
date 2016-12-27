@@ -8,6 +8,7 @@ import os
 import logging
 from pathlib import Path
 import subprocess
+import atexit
 from os.path import expanduser
 import m1
 from m1.menuitem import MenuItem
@@ -71,9 +72,10 @@ class Menu:
             item.menu.create_hotkeys()
 
     def draw(self):
-        if self.screen != None:
-            self.screen.border()
-            self.screen.addstr(0, 2,  "  M1 Cli Menu  ")
+        if self.screen == None:
+            return
+        self.screen.border()
+        self.screen.addstr(0, 2,  "  M1 Cli Menu  ")
         row = 2
         # todo position instead of string concat
         for menuItem in self.items:
@@ -89,11 +91,9 @@ class Menu:
                 title = "    " + title
             if (self.active_row == row):
                 # todo separate making title
-                if self.screen != None:
-                    self.screen.addstr(row, 2, "--->> " + title + " <<---", curses.color_pair(1))
+                self.screen.addstr(row, 2, "--->> " + title + " <<---", curses.color_pair(1))
             else:
-                if self.screen != None:
-                    self.screen.addstr(row, 2, "      " + title + "      ")
+                self.screen.addstr(row, 2, "      " + title + "      ")
             row = row + 1 
         self.screen.refresh()
         return self
@@ -129,7 +129,7 @@ class Menu:
         action = selected_item.action
         if action != None:
             args = action.split(" ")
-            subprocess.run(args)
+            atexit.register(subprocess.run,args)
             sys.exit()
 
         return self.go_in()

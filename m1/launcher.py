@@ -22,8 +22,17 @@ logging.basicConfig(
         level = logging.DEBUG
 )
 
+def get_cli_args():
+    parser = argparse.ArgumentParser(description='Get properties for alfalab cli')
+    parser.add_argument('key',
+                        metavar = 'key',
+                        type = str, 
+                        nargs = 1,
+                        help = 'property key')
+    return parser.parse_args()
+
 def main(stdscr):
-    # Clear screen
+    # Init curses 
     curses.curs_set(0)
     curses.start_color()
     curses.use_default_colors()
@@ -47,8 +56,8 @@ def main(stdscr):
         if key not in ('KEY_DOWN','KEY_UP','KEY_LEFT','KEY_RIGHT', '\n'):
             menu = menu.handle_hotkey(key)
 
-def show():
-    wrapper(main)
-
 if __name__ == '__main__':
-        show()
+    # args = get_cli_args()
+    # print(Config().get_value("global",args.key[0]))
+    menu = create_menu()
+    # wrapper(main)
