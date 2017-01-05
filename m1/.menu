@@ -1,0 +1,24 @@
+{
+    "menu":[
+        {
+            "name": "projects",
+            "menu": [
+                {
+                    "generator": "~/.config/m1/generators/vim_projects.py"
+                }
+            ]
+        },
+        {
+            "name": "tmux",
+            "menu": [
+                {
+                    "generator": "~/.config/m1/generators/tmux_menu.py"
+                },
+                {
+                    "name": "new session",
+                    "action": "tmux -2"
+                }
+            ]
+        }
+    ]
+}

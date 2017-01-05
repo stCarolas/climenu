@@ -49,7 +49,6 @@ class Menu:
                     match0 = match[0]
                     if match0 != None and match0 != '':
                         command =  match0.replace('~', str(Path.home()))
-                        print(command)
                         args.append(match0.replace('~', str(Path.home())))
                     else:
                         args.append(match[1])

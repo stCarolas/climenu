@@ -11,9 +11,11 @@ from m1.menuitem import MenuItem
 
 def load_menu(menu, filepath):
     try:
+        print("loading menu")
         config = json.load(open(expanduser(filepath)))
         for item in config['menu']:
             menu.add_item(item)
+        print("before creating hotkeys")
         menu.create_hotkeys()
     except Exception as a:
             logging.warn("exception while loading menu " + str(a))
@@ -44,23 +46,21 @@ def create_menu(stdscr = None):
         logging.debug(print_menu(menu))
         return menu
 
-def print_menu_simple(menu, with_action = False):
-    printed_menu =  ""
-    if type(menu) == Menu:
-        if menu.name != None:
-            printed_menu = printed_menu + "#" + menu.name
-        return printed_menu
-    if menu.menu != None:
-        if menu.name != None:
-            printed_menu = printed_menu + "#" + menu.name
-        for item in menu.menu.items:
-            printed_menu = printed_menu + "\n" + print_menu(item)
-    if type(menu) == MenuItem:
-        if menu.name != None:
-            printed_menu = printed_menu + menu.name
-        if menu.action != None:
-            printed_menu = printed_menu + " !" + menu.action
-    return printed_menu
+def print_menu_simple(menu):
+    listed_menu =  ""
+    # if type(menu) == Menu:
+        # if menu.name != None:
+            # printed_menu = printed_menu + "\n" + menu.name
+        # return printed_menu
+    # if menu.menu != None:
+        # if menu.name != None:
+            # printed_menu = printed_menu + "\n" + menu.name
+        # for item in menu.menu.items:
+            # printed_menu = printed_menu + "\n" + print_menu_simple(item)
+    # if type(menu) == MenuItem:
+        # if menu.name != None:
+            # printed_menu = printed_menu + menu.name
+    return listed_menu 
     
 def print_menu(menu):
     printed_menu =  ""

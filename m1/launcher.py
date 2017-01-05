@@ -10,6 +10,7 @@ from curses import wrapper
 from m1.menu import Menu
 from m1.menuitem import MenuItem
 from m1.menufactory import create_menu
+from m1.menufactory import print_menu_simple 
 
 logPath = expanduser('~/m1.log')
 try:
@@ -19,7 +20,7 @@ except:
 
 logging.basicConfig(
         filename = expanduser(logPath),
-        level = logging.DEBUG
+        level = logging.WARN
 )
 
 def get_cli_args():
@@ -56,8 +57,14 @@ def main(stdscr):
         if key not in ('KEY_DOWN','KEY_UP','KEY_LEFT','KEY_RIGHT', '\n'):
             menu = menu.handle_hotkey(key)
 
-if __name__ == '__main__':
+def show():
+    print("test")
     # args = get_cli_args()
     # print(Config().get_value("global",args.key[0]))
     menu = create_menu()
+    print("MENU:\n")
+    print_menu_simple(menu)
     # wrapper(main)
+
+if __name__ == '__main__':
+    show()
