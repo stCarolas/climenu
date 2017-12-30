@@ -8,14 +8,14 @@ def formalize_name(name):
     return name
 
 def cut_name(name):
-    if (len(name) > 50):
-        return name[:18] + ".."
+    if (len(name) > 80):
+        return name[:58] + ".."
     return name
 
 class MenuItem:
     def __init__(self):
         self.name = ""
-        self.action = None
-        self.menu = None
         self.hotkey = None
-        self.generator = None
+
+    def set_name(self, name):
+        self.name = formalize_name(cut_name(name))

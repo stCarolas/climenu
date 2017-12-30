@@ -10,7 +10,7 @@ setup(
     author_email    =   'stcarolas@gmail.com',
     packages        =   find_packages(),
     entry_points    =   {
-                            'console_scripts': ['m1 = m1.launcher:show']
+                            'console_scripts': ['m1 = m1.launcher:main']
                         },
     data_files      =   [
                          ('/home/stcarolas/.config/m1/plugins', ['plugins/vim_projects.py', 'plugins/tmux_menu.py']),

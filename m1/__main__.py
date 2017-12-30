@@ -3,6 +3,6 @@
 import m1.launcher
 
 if __name__ == '__main__':
-    launcher.show()
+    launcher.main()
 
 

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import curses
-import json
 import logging
 import os
+import sys
 from pathlib import Path
 from os.path import expanduser
-from curses import wrapper
 from m1.menu import Menu
+from m1.getch import _Getch
 from m1.menuitem import MenuItem
 from m1.menufactory import create_menu
 
@@ -22,33 +21,19 @@ logging.basicConfig(
         level = logging.DEBUG
 )
 
-def main(stdscr):
-    # Clear screen
-    curses.curs_set(0)
-    curses.start_color()
-    curses.use_default_colors()
-
-    menu = create_menu(stdscr)
-
-    key = ''
-    while key != 'q':
-        menu.draw()
-        key = stdscr.getkey()
-        if (key == 'KEY_DOWN'):
-            menu = menu.next()
-        if (key == 'KEY_UP'):
-            menu = menu.prev()
-        if (key == 'KEY_LEFT'):
-            menu = menu.back()
-        if (key == 'KEY_RIGHT'):
-            menu = menu.go_in()
-        if (key == '\n'):
-            menu = menu.execute()
-        if key not in ('KEY_DOWN','KEY_UP','KEY_LEFT','KEY_RIGHT', '\n'):
-            menu = menu.handle_hotkey(key)
-
-def show():
-    wrapper(main)
+def main():
+    menu = create_menu()
+    for item in menu.items:
+        line= item.hotkey + ": " + item.name
+        # sys.stdout.write(line)
+        print(line.rstrip("\n"))
+    f=open("/dev/tty")
+    os.dup2(f.fileno(), 0)
+    key = _Getch()
+    with open("/tmp/m1","w") as out:
+        choice = menu.handle_hotkey(key())
+        if choice != None:
+            out.write(choice.strip())
 
 if __name__ == '__main__':
-        show()
+    main()
