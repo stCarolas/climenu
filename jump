@@ -1,0 +1,11 @@
+#! /bin/sh
+#
+# jump.sh
+# Copyright (C) 2018 stcarolas <stcarolas@carbon>
+#
+# Distributed under terms of the MIT license.
+#
+
+
+ls --group-directories-first | m1
+cd $(cat /tmp/m1)
