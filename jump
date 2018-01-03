@@ -8,4 +8,7 @@
 
 
 ls --group-directories-first | m1
-cd $(cat /tmp/m1)
+local target=$(cat /tmp/m1)
+if [ -n "$target" ]; then
+  cd $target
+fi
