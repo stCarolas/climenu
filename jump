@@ -9,6 +9,8 @@
 
 ls --group-directories-first | m1
 export target=$(cat /tmp/m1)
-if [ -n "$target" ]; then
+if [ -d "$target" ]; then
   cd $target
+else
+  rifle $target
 fi

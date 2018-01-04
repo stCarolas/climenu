@@ -18,4 +18,4 @@ class MenuItem:
         self.hotkey = None
 
     def set_name(self, name):
-        self.name = formalize_name(cut_name(name))
+        self.name = cut_name(name)

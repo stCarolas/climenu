@@ -23,8 +23,7 @@ class Menu:
 
     def handle_hotkey(self, key):
         if key in self.hotkeys.keys():
-            selected_item = self.hotkeys[key]
-            return selected_item.name
+            return self.hotkeys[key]
         return None
 
     def create_hotkeys(self):
